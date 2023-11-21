@@ -2,12 +2,12 @@ import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
 
 const Category = sequelize.define("Category", {
-  categoryName: {
-    type: DataTypes.CHAR,
+  category_name: {
+    type: DataTypes.TEXT,
     allowNull: false,
   },
-  categoryImage: {
-    type: DataTypes.BLOB,
+  category_image: {
+    type: DataTypes.TEXT,
     allowNull: true,
   },
 });

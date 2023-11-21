@@ -2,7 +2,11 @@ import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
 
 const Income = sequelize.define("Income", {
-  incomeAmount: {
+  income_name: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  income_amount: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },

@@ -1,50 +1,33 @@
-// import express  from "express";
-// import dotenv from "dotenv";
-// import sequelize from "./db.js";
-// dotenv.config();
-
-// const app = express();
-
-// await sequelize.sync();
-
-// app.listen(process.env.PORT, (error)=>{
-//     if(error){
-//         console.error(error);
-//     }
-//     else{
-//         console.log(`Server is listening at port ${process.env.PORT}`);
-//     }
-// })
-
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
 import sequelize from "./db.js";
 import bodyParser from "body-parser";
-import companyRouter from './routes/companyRouter.js';
-import sequelize from "./db.js";
-import Income from "./models/income.js"; // Import your Sequelize models
-import Category from "./models/category.js";
-dotenv.config();
+import companyRouter from "./routes/companyRouter.js";
+import categoryRouter from "./routes/categoryRouter.js";
+import incomeRouter from "./routes/incomeRouter.js";
+
 const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 
-async function startServer() {
-  try {
-    // Synchronize Sequelize models with the database
-    sequelize.sync({ force: true }).then(() => {
-      console.log("Database and tables synced");
-    });
-    // Start the Express.js server
-    app.listen(process.env.PORT, (error) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log(`Server is listening at port ${process.env.PORT}`);
-      }
-    });
-  } catch (error) {
-    console.error("Error syncing Sequelize models:", error);
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
+
+app.use("/api/company", companyRouter);
+app.use("/api/category", categoryRouter);
+app.use("/api/income", incomeRouter);
+
+// await sequelize.sync();
+await sequelize.sync({ alter: true });
+
+app.listen(process.env.PORT, (error) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log(`Server is listening at port ${process.env.PORT}`);
   }
-}
-
-// Call the async function to start the server
-startServer();
+});
