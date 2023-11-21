@@ -1,8 +1,8 @@
-import sequelize from "../db";
+import sequelize from "../db.js";
 import {DataTypes} from "sequelize";
 
 const Company = sequelize.define('Company',{
-name:{
+company_name:{
     type:DataTypes.TEXT,
     allowNull:false
 },
@@ -11,7 +11,7 @@ description:{
     allowNull:false
 },
 profit:{
-    type:DataTypes.NUMBER,
+    type:DataTypes.INTEGER,
     allowNull:false
 },
 
