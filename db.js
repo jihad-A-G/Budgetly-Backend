@@ -1,10 +1,19 @@
 import {Sequelize} from "sequelize";
+import dotenv from "dotenv";
+dotenv.config();
 
-const sequelize = new Sequelize('Budgelty', 'sa', 'Node@7327', {
+const sequelize = new Sequelize('Budgetly', 'sa', `${process.env.DB_PASSWORD}`, {
     host: 'localhost',
-    dialect:'mssql'
+    port:"1433",
+    dialect:'mssql',
+    dialectOptions: {
+      options: {
+          encrypt: true,
+      }
+    }
   });
 
+  
   try {
     await sequelize.authenticate();
     console.log('Connection has been established successfully.');
