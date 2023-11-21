@@ -19,10 +19,12 @@
 import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./db.js";
+import bodyParser from "body-parser";
+import companyRouter from './routes/companyRouter.js';
+import sequelize from "./db.js";
 import Income from "./models/income.js"; // Import your Sequelize models
 import Category from "./models/category.js";
 dotenv.config();
-
 const app = express();
 
 async function startServer() {
