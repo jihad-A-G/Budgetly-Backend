@@ -1,6 +1,6 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
-
+import Category from "./category.js";
 const Income = sequelize.define("Income", {
   income_name: {
     type: DataTypes.TEXT,
@@ -12,4 +12,10 @@ const Income = sequelize.define("Income", {
   },
 });
 
+// to make the link
+const associateModels = () => {
+  Income.belongsTo(Category);
+};
+
+export { associateModels };
 export default Income;
