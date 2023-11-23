@@ -25,7 +25,8 @@ user_img:{
 authorized:{
     type:DataTypes.BOOLEAN,
     defaultValue:false
-}
+},
+
 
 
 })
