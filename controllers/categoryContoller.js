@@ -1,9 +1,11 @@
 import Category from "../models/category.js";
+import fs from 'fs/promises';
 
 //Create a new category
 export const addCategory = async (req, res, next) => {
   try {
-    const { category_name, category_image } = req.body;
+    const { category_name } = req.body;
+
     // check if the category is already created
     const existingCategory = await Category.findOne({
       where: { category_name: category_name },
@@ -14,6 +16,8 @@ export const addCategory = async (req, res, next) => {
         .status(400)
         .json({ message: "Category with this name already exists." });
     }
+
+    const category_image = req.file ? req.file.path : null;
 
     // creates the category if its not created previously
     const newCategory = await Category.create({
@@ -34,18 +38,32 @@ export const addCategory = async (req, res, next) => {
 export const updateCategory = async (req, res, next) => {
   try {
     if (req.body) {
-      const category = await Category.update(
+      // Find the category by ID before the update
+      const updateCategory = await Category.findByPk(req.params.id);
+      
+      if(req.file){
+       // Delete the existing image file if it exists
+       if (updateCategory.category_image) {
+        await fs.unlink(updateCategory.category_image);
+      }
+      // Update the category with the new image path
+      req.body.category_image = req.file.path;
+      }
+
+      // Update the category
+      const [numRowsUpdated, [updatedCategory]] = await Category.update(
         { ...req.body },
-        { where: { id: req.params.id } }
+        { where: { id: req.params.id }, returning: true }
       );
-      // in sql update returns this [numRowsUpdated, [updatedRows]]
-      // so if the category was found it will return 1 updated row with the name of the new row
-      // category[0] === 1 means 1 row was updated
-      // if no categories were update it will return as category[0] === 0; which means no row was updated
-      if (category[0] === 1) {
-        return res
-          .status(200)
-          .json({ message: `Category updated successfully!` });
+
+      // numRowsUpdated is the number of rows affected by the update
+      if (numRowsUpdated === 1) {
+        const oldCategoryName = updateCategory.category_name;
+        const newCategoryName = updatedCategory.category_name;
+
+        return res.status(200).json({
+          message: `Category ${oldCategoryName} was updated successfully to ${newCategoryName}!`,
+        });
       } else {
         return res.status(404).json({ message: `Category not found` });
       }
@@ -58,10 +76,10 @@ export const updateCategory = async (req, res, next) => {
 };
 
 // Delete a category
-// should we put the category's name that's being deleted in the response??
 export const deleteCategory = async (req, res, next) => {
   try {
     const id = req.params.id;
+    const deletedCategoryName = await Category.findByPk(req.params.id);
     if (id) {
       const category = await Category.destroy({
         where: { id: id },
@@ -69,7 +87,9 @@ export const deleteCategory = async (req, res, next) => {
       // same concept as before if the number of rows is greater than 0 then it means rows' number updated
       // if it is 0 then it did not update/delete
       if (category > 0) {
-        return res.status(200).json({ message: `Category was deleted!` });
+        return res.status(200).json({
+          message: `Category ${deletedCategoryName.category_name} was deleted!`,
+        });
       } else {
         return res.status(404).json({ message: `Category not found` });
       }
