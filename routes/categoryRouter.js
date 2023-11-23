@@ -23,4 +23,5 @@ router.patch(
 router.delete("/:id", categoryController.deleteCategory);
 router.get("/:id", categoryController.singleCategory);
 router.get("/", categoryController.allCategories);
+
 export default router;
