@@ -1,4 +1,4 @@
-import sequelize from "../db";
+import sequelize from "../db.js";
 import {DataTypes} from "sequelize";
 
 const User = sequelize.define('User',{
@@ -16,11 +16,11 @@ password:{
 },
 role:{
     type:DataTypes.TEXT,
-    allowNull:false
+    allowNull:true
 },
 user_img:{
     type:DataTypes.TEXT,
-    allowNull:false
+    defaultValue:null
 },
 authorized:{
     type:DataTypes.BOOLEAN,
