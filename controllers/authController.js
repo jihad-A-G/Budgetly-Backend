@@ -63,10 +63,13 @@ export const requestResetPassword = async(req,res,next) =>{
 export const resetPassword = async(req,res,next) =>{
     const {token,userId} =req.params;
     const {password} = req.body;
-    if(jwt.verify(token,'JAG1000') && password){
+    try{ 
+            if(jwt.verify(token,'JAG1000') && password){
         const hashedPassword= await bcrypt.hash(password,12);
         const user = await User.update({password:hashedPassword},{where:{id:userId}});
         return res.status(200).json({user:user,message:'Password cahnged successfully!'});
     }
     res.status(400).json({message:'Token is not valid, request new one!'});
+}catch(err){console.error(err);}
+
 }

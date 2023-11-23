@@ -7,6 +7,7 @@ import connectionSession from "connect-session-sequelize";
 //Routers
 import companyRouter from './routes/companyRouter.js';
 import AdminRouter from './routes/AdminRouter.js';
+import userRouter from './routes/userRouter.js';
 import authRouter from './routes/authRouter.js';
 dotenv.config();
 const app = express();
@@ -33,8 +34,8 @@ app.use((req,res,next)=>{
 })
 app.use('/api/auth',authRouter);
 app.use('/api/company',companyRouter);
-app.use('/api/user',AdminRouter);
-
+app.use('/api/admin',AdminRouter);
+app.use('/api/user',userRouter);
 await sequelize.sync();
 
 app.listen(process.env.PORT, (error)=>{

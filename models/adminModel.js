@@ -1,4 +1,4 @@
-import sequelize from "../db";
+import sequelize from "../db.js";
 import {DataTypes} from "sequelize";
 
 const Admin = sequelize.define('Admin',{
@@ -16,7 +16,7 @@ password:{
 },
 admin_img:{
     type:DataTypes.TEXT,
-    allowNull:false
+    defaultValue:null
 },
 
 
