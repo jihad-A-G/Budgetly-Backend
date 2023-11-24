@@ -4,6 +4,7 @@ import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import session from "express-session";
 import connectionSession from "connect-session-sequelize";
+import './associations.js';
 //Routers
 import companyRouter from './routes/companyRouter.js';
 import AdminRouter from './routes/AdminRouter.js';
