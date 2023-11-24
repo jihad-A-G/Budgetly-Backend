@@ -1,10 +1,11 @@
 import Category from "../models/category.js";
-import fs from 'fs/promises';
+import fs from "fs/promises";
+import { Op } from "sequelize";
 
 //Create a new category
 export const addCategory = async (req, res, next) => {
   try {
-    const { category_name } = req.body;
+    const { category_name, date } = req.body;
 
     // check if the category is already created
     const existingCategory = await Category.findOne({
@@ -23,6 +24,7 @@ export const addCategory = async (req, res, next) => {
     const newCategory = await Category.create({
       category_name: category_name,
       category_image: category_image,
+      date: date,
     });
 
     return res.status(200).json({
@@ -40,29 +42,29 @@ export const updateCategory = async (req, res, next) => {
     if (req.body) {
       // Find the category by ID before the update
       const updateCategory = await Category.findByPk(req.params.id);
-      
-      if(req.file){
-       // Delete the existing image file if it exists
-       if (updateCategory.category_image) {
-        await fs.unlink(updateCategory.category_image);
-      }
-      // Update the category with the new image path
-      req.body.category_image = req.file.path;
+
+      if (req.file) {
+        // Delete the existing image file if it exists
+        if (updateCategory.category_image) {
+          await fs.unlink(updateCategory.category_image);
+        }
+        // Update the category with the new image path
+        req.body.category_image = req.file.path;
+      } else {
+        // If req.file is not provided, set category_image to null
+        req.body.category_image = null;
       }
 
       // Update the category
-      const [numRowsUpdated, [updatedCategory]] = await Category.update(
+      const [numRowsUpdated] = await Category.update(
         { ...req.body },
         { where: { id: req.params.id }, returning: true }
       );
 
       // numRowsUpdated is the number of rows affected by the update
       if (numRowsUpdated === 1) {
-        const oldCategoryName = updateCategory.category_name;
-        const newCategoryName = updatedCategory.category_name;
-
         return res.status(200).json({
-          message: `Category ${oldCategoryName} was updated successfully to ${newCategoryName}!`,
+          message: `Category updated successfully!!`,
         });
       } else {
         return res.status(404).json({ message: `Category not found` });
@@ -139,5 +141,124 @@ export const allCategories = async (req, res, next) => {
     res.status(200).json(categories);
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve the categories" });
+  }
+};
+
+// Get Categories by Day
+export const getCategoriesByDay = async (req, res) => {
+  try {
+    const requestedDate = new Date(req.params.date);
+    const startOfDay = new Date(
+      requestedDate.getFullYear(),
+      requestedDate.getMonth(),
+      requestedDate.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+    const endOfDay = new Date(
+      requestedDate.getFullYear(),
+      requestedDate.getMonth(),
+      requestedDate.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
+
+    const categoriesByDay = await Category.findAll({
+      where: {
+        date: {
+          [Op.between]: [startOfDay, endOfDay],
+        },
+      },
+      order: [["date", "DESC"]],
+    });
+
+    if (categoriesByDay.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No categories found for the specified period." });
+    }
+
+    res.status(200).json(categoriesByDay);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Error fetching categories for the specified day" });
+  }
+};
+
+// Get Categories by Week
+export const getCategoriesByWeek = async (req, res) => {
+  try {
+    const selectedDate = new Date(req.params.selectedDate);
+    const sortOrder = req.query.order === "asc" ? "ASC" : "DESC";
+
+    const startOfInterval = new Date(selectedDate);
+    startOfInterval.setHours(0, 0, 0, 0);
+
+    const endOfInterval = new Date(selectedDate);
+    endOfInterval.setDate(selectedDate.getDate() + 6);
+    endOfInterval.setHours(23, 59, 59, 999);
+
+    const categoriesByWeek = await Category.findAll({
+      where: {
+        date: {
+          [Op.between]: [startOfInterval, endOfInterval],
+        },
+      },
+      order: [["date", sortOrder]],
+    });
+
+    if (categoriesByWeek.length === 0) {
+      return res.status(200).json({
+        message: "No categories found for the specified period.",
+      });
+    }
+
+    res.status(200).json(categoriesByWeek);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: "Error fetching categories for the specified week",
+    });
+  }
+};
+
+// Get Categories by Month
+export const getCategoriesByMonth = async (req, res) => {
+  try {
+    const { year, month, order } = req.query;
+
+    const startOfMonth = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // Check if there's an "order" parameter
+    const sortOrder = order === "asc" ? "ASC" : "DESC";
+
+    const categoriesByMonth = await Category.findAll({
+      where: {
+        date: {
+          [Op.between]: [startOfMonth, endOfMonth],
+        },
+      },
+      order: [["date", sortOrder]],
+    });
+
+    if (categoriesByMonth.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No categories found for the specified period." });
+    }
+
+    res.status(200).json(categoriesByMonth);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Error fetching categories for the specified month" });
   }
 };

@@ -1,12 +1,11 @@
 import Income from "../models/income.js";
-import sequelize from "../db.js";
 import Category from "../models/category.js";
-import { Op } from 'sequelize';
+import { Op } from "sequelize";
 
 //Create a new Income
 export const addIncome = async (req, res, next) => {
   try {
-    const { income_name, income_amount, CategoryId } = req.body;
+    const { income_name, income_amount, CategoryId, date } = req.body;
 
     // check if the category exists
     const existingCategory = await Category.findByPk(CategoryId);
@@ -33,6 +32,7 @@ export const addIncome = async (req, res, next) => {
       income_name: income_name,
       income_amount: income_amount,
       CategoryId: CategoryId,
+      date: date,
     });
 
     const { category_name } = await newIncome.getCategory();
@@ -50,25 +50,29 @@ export const addIncome = async (req, res, next) => {
 // Update an existing Income
 export const updateIncome = async (req, res, next) => {
   try {
-    const { income_name, income_amount, CategoryId } = req.body;
+    const { income_name, income_amount, date, CategoryId } = req.body;
     const income = await Income.findByPk(req.params.id);
-
-    const existingCategory = await Category.findByPk(CategoryId);
-    if (!existingCategory) {
-      return res.status(404).json({
-        message: `Category with id ${CategoryId} not found.`,
-      });
-    }
 
     if (!income) {
       return res.status(404).json({ message: "Income not found" });
     }
 
-    await income.update({
-      income_name: income_name,
-      income_amount: income_amount,
-      CategoryId: CategoryId,
-    });
+    // update CategoryId if it's provided in the request body
+    if (CategoryId !== undefined) {
+      const existingCategory = await Category.findByPk(CategoryId);
+      if (!existingCategory) {
+        return res.status(404).json({
+          message: `Category with id ${CategoryId} not found.`,
+        });
+      }
+
+      await income.update({
+        income_name: income_name,
+        income_amount: income_amount,
+        date: date,
+        CategoryId: CategoryId,
+      });
+    }
 
     return res.status(200).json({ message: "Income updated successfully!" });
   } catch (error) {
@@ -129,12 +133,14 @@ export const singleIncome = async (req, res, next) => {
   }
 };
 
-// get all incomes without sorting
+// get all incomes - desc order
 export const allIncomes = async (req, res, next) => {
   try {
-    const incomes = await Income.findAll();
+    const incomes = await Income.findAll({
+      order: [["income_amount", "DESC"]],
+    });
 
-    if (!incomes) {
+    if (!incomes.length) {
       return res.status(404).json({ error: "No incomes found" });
     }
 
@@ -164,7 +170,7 @@ export const getIncomesByCategory = async (req, res, next) => {
     if (incomes.length === 0) {
       return res
         .status(404)
-        .json({ error: `No incomes found in category '${category}'` });
+        .json({ error: `No incomes found in category ${category}` });
     }
 
     res.status(200).json(incomes);
@@ -186,7 +192,7 @@ export const sumOfIncomes = async (req, res, next) => {
 };
 
 //filtering
-// Asc order for income
+// get all income by Asc order for income
 export const allIncomesAsc = async (req, res, next) => {
   try {
     const incomes = await Income.findAll({
@@ -199,81 +205,121 @@ export const allIncomesAsc = async (req, res, next) => {
   }
 };
 
-// Desc order for income
-export const allIncomesDesc = async (req, res, next) => {
+// Get Incomes by Day
+export const getIncomesByDay = async (req, res) => {
   try {
-    const incomes = await Income.findAll({
-      order: [["income_amount", "DESC"]],
-    });
-    res.json(incomes);
-  } catch (error) {
-    console.error("Error fetching incomes:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+    const requestedDate = new Date(req.params.date);
+    const startOfDay = new Date(
+      requestedDate.getFullYear(),
+      requestedDate.getMonth(),
+      requestedDate.getDate(),
+      0,
+      0,
+      0,
+      0
+    );
+    const endOfDay = new Date(
+      requestedDate.getFullYear(),
+      requestedDate.getMonth(),
+      requestedDate.getDate(),
+      23,
+      59,
+      59,
+      999
+    );
 
-// Filter incomes by daily interval
-export const getDailyIncomes = async (req, res, next) => {
-  try {
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
-
-    const dailyIncomes = await Income.findAll({
+    const incomesByDay = await Income.findAll({
       where: {
-        createdAt: {
+        date: {
           [Op.between]: [startOfDay, endOfDay],
         },
       },
+      order: [["date", "DESC"]],
     });
 
-    res.status(200).json(dailyIncomes);
+    if (incomesByDay.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No incomes found for the specified period." });
+    }
+
+    res.status(200).json(incomesByDay);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching daily incomes" });
+    res
+      .status(500)
+      .json({ error: "Error fetching incomes for the specified day" });
   }
 };
 
-// Filter incomes by weekly interval
-export const getWeeklyIncomes = async (req, res, next) => {
+// Get Incomes by Week
+export const getIncomesByWeek = async (req, res) => {
   try {
-    const today = new Date();
-    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay(), 0, 0, 0, 0);
-    const endOfWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + 6, 23, 59, 59, 999);
+    const selectedDate = new Date(req.params.selectedDate);
+    const sortOrder = req.query.order === "asc" ? "ASC" : "DESC";
 
-    const weeklyIncomes = await Income.findAll({
+    const startOfInterval = new Date(selectedDate);
+    startOfInterval.setHours(0, 0, 0, 0);
+
+    const endOfInterval = new Date(selectedDate);
+    endOfInterval.setDate(selectedDate.getDate() + 6);
+    endOfInterval.setHours(23, 59, 59, 999);
+
+    const IncomesByWeek = await Income.findAll({
       where: {
-        createdAt: {
-          [Op.between]: [startOfWeek, endOfWeek],
+        date: {
+          [Op.between]: [startOfInterval, endOfInterval],
         },
       },
+      order: [["date", sortOrder]],
     });
 
-    res.status(200).json(weeklyIncomes);
+    if (IncomesByWeek.length === 0) {
+      return res.status(200).json({
+        message: "No incomes found for the specified period.",
+      });
+    }
+
+    res.status(200).json(IncomesByWeek);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching weekly incomes" });
+    res.status(500).json({
+      error: "Error fetching incomes for the specified week",
+    });
   }
 };
 
-// Filter incomes by monthly interval
-export const getMonthlyIncomes = async (req, res, next) => {
+// Get Incomes by Month
+export const getIncomesByMonth = async (req, res) => {
   try {
-    const today = new Date();
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0, 0);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+    const { year, month, order } = req.query;
 
-    const monthlyIncomes = await Income.findAll({
+    const startOfMonth = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+    // Check if there's an "order" parameter
+    const sortOrder = order === "asc" ? "ASC" : "DESC";
+
+    const incomesByMonth = await Income.findAll({
       where: {
-        createdAt: {
+        date: {
           [Op.between]: [startOfMonth, endOfMonth],
         },
       },
+      order: [["date", sortOrder]],
     });
 
-    res.status(200).json(monthlyIncomes);
+    if (incomesByMonth.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No incomes found for the specified period." });
+    }
+
+    res.status(200).json(incomesByMonth);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching monthly incomes" });
+    res
+      .status(500)
+      .json({ error: "Error fetching incomes for the specified month" });
   }
 };

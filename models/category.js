@@ -1,6 +1,6 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
-import Income from "./income.js";
+// import Income from "./income.js";
 const Category = sequelize.define("Category", {
   category_name: {
     type: DataTypes.TEXT,
@@ -10,12 +10,10 @@ const Category = sequelize.define("Category", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  date: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+  },
 });
 
-//to make the link
-const associateModels = () => {
-  Category.hasMany(Income);
-};
-
-export { associateModels };
 export default Category;

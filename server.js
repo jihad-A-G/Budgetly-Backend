@@ -9,7 +9,6 @@ import categoryRouter from "./routes/categoryRouter.js";
 import incomeRouter from "./routes/incomeRouter.js";
 
 import { associateModels as associateIncomeModels } from "./models/income.js";
-import { associateModels as associateCategoryModels } from "./models/category.js";
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -25,10 +24,10 @@ app.use("/api/category", categoryRouter);
 app.use("/api/income", incomeRouter);
 
 associateIncomeModels();
-associateCategoryModels();
 
-// await sequelize.sync();
-await sequelize.sync({ alter: true });
+await sequelize.sync();
+// await sequelize.sync({ alter: true });
+// await sequelize.sync({ force: true });
 
 app.listen(process.env.PORT, (error) => {
   if (error) {
