@@ -3,17 +3,23 @@ import dotenv from "dotenv";
 import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import companyRouter from './routes/companyRouter.js';
+import expenseRouter from './routes/expenseRouter.js';
 dotenv.config();
 const app = express();
-app.use(bodyParser.urlencoded({extended:false}));
+//in order to let node understand the written code extended no need for it(we need only one thing)
+//check for urlencoded when true when false
+// app.use(bodyParser.urlencoded({extended:false}));
+// app.use(bodyParser.json());
+app.use(express.json());
 
-
+// it log what method u did (patch,create...)
 app.use((req,res,next)=>{
     console.log(req.path, req.method);
     next();
 })
 
-app.use('/api/company',companyRouter);
+app.use('/api',companyRouter);
+app.use('/api',expenseRouter);
 
 await sequelize.sync();
 

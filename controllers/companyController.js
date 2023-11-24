@@ -1,6 +1,6 @@
 import Company from "../models/company.js";
 
-export const AddCompany = async (req,res,next) =>{
+export const addCompany = async (req,res,next) =>{
     const {company_name,description,profit} = req.body;
     try{
         if(req.body){

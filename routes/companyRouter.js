@@ -3,7 +3,7 @@ import * as companyController from '../controllers/companyController.js';
 
 const router =express.Router();
 
-router.post("/",companyController.AddCompany);
-router.patch("/",companyController.updateCompany);
+router.post("/company",companyController.addCompany);
+router.patch("/company",companyController.updateCompany);
 
 export default router;
