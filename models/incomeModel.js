@@ -1,6 +1,6 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
-import Category from "./category.js";
+import Category from "./categoryModel.js";
 
 const Income = sequelize.define("Income", {
   income_name: {

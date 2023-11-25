@@ -1,5 +1,5 @@
-import Income from "../models/income.js";
-import Category from "../models/category.js";
+import Income from "../models/incomeModel.js";
+import Category from "../models/categoryModel.js";
 import { Op } from "sequelize";
 
 //Create a new Income

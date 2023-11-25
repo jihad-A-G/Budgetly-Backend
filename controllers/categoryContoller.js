@@ -1,5 +1,5 @@
-import Category from "../models/category.js";
-import Income from "../models/income.js";
+import Category from "../models/categoryModel.js";
+import Income from "../models/incomeModel.js";
 import fs from "fs/promises";
 import { Op } from "sequelize";
 

@@ -1,7 +1,7 @@
-import sequelize from "../db";
+import sequelize from "../db.js";
 import {DataTypes} from "sequelize";
 
-const User = sequelize.define('User',{
+const Admin = sequelize.define('Admin',{
     username:{
         type:DataTypes.TEXT,
         allowNull:false,
@@ -14,20 +14,12 @@ password:{
     type:DataTypes.TEXT,
     allowNull:false
 },
-role:{
+admin_img:{
     type:DataTypes.TEXT,
-    allowNull:false
+    defaultValue:null
 },
-user_img:{
-    type:DataTypes.TEXT,
-    allowNull:false
-},
-authorized:{
-    type:DataTypes.BOOLEAN,
-    defaultValue:false
-}
 
 
 })
 
-export default User;
+export default Admin;
