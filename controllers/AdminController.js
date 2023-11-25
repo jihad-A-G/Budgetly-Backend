@@ -95,3 +95,27 @@ export const deleteAdmin = async(req,res,next) =>{
         res.status(200).json({admin:admin,message:'admin deleted successfully'});
     }catch(err){console.error(err);}
 };
+
+export const updateUserProfileImg = async(req,res,next) =>{
+    const image = req.file;
+    const {id} = req.params;
+    try{
+        if(image){
+            await User.update({user_img:image.path},{where:{id:id}});
+            return res.status(200).json({message:'image updated succesfully'});
+        }
+        res.status(500).json({message:'image not found'});
+    }catch(err){console.error(err);}
+}
+
+export const updateAdminProfileImg = async(req,res,next) =>{
+    const image = req.file;
+    const {id} = req.params;
+    try{
+        if(image){
+             await Admin.update({admin_img:image.path},{where:{id:id}});
+            return res.status(200).json({message:'image updated succesfully'});
+        }
+        res.status(500).json({message:'image not found'});
+    }catch(err){console.error(err);}
+}
