@@ -10,7 +10,7 @@ export const getAllExpense = async (req, res) => {
 export const getOneExpense = async (req, res) => {
     const { id } = req.params
     try {
-        const expenses = await Expense.findOne({where:{id:id}})
+        const expenses = await Expense.findOne({ where: { id: id } })
         if (!expenses) {
             res.status(404).json({ error: 'No such id' });
         }
@@ -60,13 +60,13 @@ export const updateExpense = async (req, res) => {
 export const deleteExpense = async (req, res) => {
     const { id } = req.params;
     try {
-        const deletedExpense = await Expense.findOne({where:{id:id}});
+        const deletedExpense = await Expense.findOne({ where: { id: id } });
         if (!deletedExpense) {
-            res.status(404).json({error: 'No Such ID'});
+            res.status(404).json({ error: 'No Such ID' });
         }
-        else{
-            await Expense.destroy({where:{id:id}});
-            res.status(200).json({deletedExpense});
+        else {
+            await Expense.destroy({ where: { id: id } });
+            res.status(200).json({ deletedExpense });
         }
     }
     catch (err) {

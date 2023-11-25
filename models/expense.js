@@ -1,5 +1,6 @@
 import sequelize from "../db.js";
 import DataTypes from 'sequelize'
+// import Report from '../models/report.js'
 
 const Expense = sequelize.define('Expense', {
 
@@ -19,12 +20,24 @@ const Expense = sequelize.define('Expense', {
         allowNull: false,
         unique: true
     },
-},
-    {
-        timestamps: true,
-        paranoid: true
+
+    date: {
+        type: DataTypes.DATE,
+        allowNull: false
     }
+},
+    // {
+    //     timestamps: true,
+    //     paranoid: true,
+    //     freezeTableName: true
+    // }
 );
+
+
+// Expense.belongsTo(Report, {
+//     foreignKey: 'reportId',
+//     as: 'report'
+//    });
 
 Expense.sync()
 
