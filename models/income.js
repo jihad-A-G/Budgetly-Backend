@@ -17,9 +17,12 @@ const Income = sequelize.define("Income", {
   },
 });
 
-// relation with category
+// relation with category (one to many)
 const associateModels = () => {
-  Category.hasMany(Income);
+  Category.hasMany(Income, {
+    onDelete: "CASCADE",
+    hooks: true,
+  });
   Income.belongsTo(Category);
 };
 export { associateModels };

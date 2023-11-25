@@ -35,7 +35,11 @@ export const addIncome = async (req, res, next) => {
       date: date,
     });
 
-    const { category_name } = await newIncome.getCategory();
+    // include category
+    const createdIncome = await Income.findByPk(newIncome.id, {
+      include: [Category],
+    });
+    const category_name = createdIncome.Category.category_name;
 
     return res.status(201).json({
       message: `${newIncome.income_name} was created successfully!`,
@@ -57,24 +61,49 @@ export const updateIncome = async (req, res, next) => {
       return res.status(404).json({ message: "Income not found" });
     }
 
-    // update CategoryId if it's provided in the request body
+    // Create an object with only the fields to be updated
+    const updateFields = {};
+    if (income_name !== undefined) {
+      updateFields.income_name = income_name;
+    }
+    if (income_amount !== undefined) {
+      updateFields.income_amount = income_amount;
+    }
+    if (date !== undefined) {
+      updateFields.date = date;
+    }
+    
     if (CategoryId !== undefined) {
+      // Check if the specified CategoryId exists
       const existingCategory = await Category.findByPk(CategoryId);
       if (!existingCategory) {
         return res.status(404).json({
           message: `Category with id ${CategoryId} not found.`,
         });
       }
+      updateFields.CategoryId = CategoryId;
+    }
 
-      await income.update({
-        income_name: income_name,
-        income_amount: income_amount,
-        date: date,
-        CategoryId: CategoryId,
+    // Update only the specified fields
+    const [numRowsUpdated] = await Income.update(updateFields, {
+      where: { id: req.params.id },
+    });
+
+    if (numRowsUpdated === 0) {
+      return res.status(500).json({
+        message: "Failed to update income. No rows were affected.",
       });
     }
 
-    return res.status(200).json({ message: "Income updated successfully!" });
+    // Include category
+    const updatedIncome = await Income.findByPk(req.params.id, {
+      include: [Category],
+    });
+
+    return res.status(200).json({
+      message: "Income updated successfully!",
+      updatedIncome: updatedIncome,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -121,6 +150,7 @@ export const singleIncome = async (req, res, next) => {
 
     const oneIncome = await Income.findOne({
       where: { id: id },
+      include: [Category],
     });
 
     if (!oneIncome) {
@@ -133,11 +163,34 @@ export const singleIncome = async (req, res, next) => {
   }
 };
 
-// get all incomes - desc order
+// get all incomes (based on income amount desc/asc)
 export const allIncomes = async (req, res, next) => {
   try {
+    const orderDirection = req.query.order === "asc" ? "ASC" : "DESC";
+
     const incomes = await Income.findAll({
-      order: [["income_amount", "DESC"]],
+      order: [["income_amount", orderDirection]],
+      include: [Category],
+    });
+
+    if (!incomes.length) {
+      return res.status(404).json({ error: "No incomes found" });
+    }
+
+    res.status(200).json(incomes);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to retrieve the incomes" });
+  }
+};
+
+// get all incomes (based on income name desc/asc)
+export const allIncomesByName = async (req, res, next) => {
+  try {
+    const orderDirection = req.query.order === "asc" ? "ASC" : "DESC";
+
+    const incomes = await Income.findAll({
+      order: [["income_name", orderDirection]],
+      include: [Category],
     });
 
     if (!incomes.length) {
@@ -192,19 +245,6 @@ export const sumOfIncomes = async (req, res, next) => {
 };
 
 //filtering
-// get all income by Asc order for income
-export const allIncomesAsc = async (req, res, next) => {
-  try {
-    const incomes = await Income.findAll({
-      order: [["income_amount", "ASC"]],
-    });
-    res.json(incomes);
-  } catch (error) {
-    console.error("Error fetching incomes:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
 // Get Incomes by Day
 export const getIncomesByDay = async (req, res) => {
   try {

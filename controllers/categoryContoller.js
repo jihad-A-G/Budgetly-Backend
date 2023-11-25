@@ -1,4 +1,5 @@
 import Category from "../models/category.js";
+import Income from "../models/income.js";
 import fs from "fs/promises";
 import { Op } from "sequelize";
 
@@ -48,10 +49,9 @@ export const updateCategory = async (req, res, next) => {
         if (updateCategory.category_image) {
           await fs.unlink(updateCategory.category_image);
         }
-        // Update the category with the new image path
+        // update the category with the new image path
         req.body.category_image = req.file.path;
       } else {
-        // If req.file is not provided, set category_image to null
         req.body.category_image = null;
       }
 
@@ -64,40 +64,40 @@ export const updateCategory = async (req, res, next) => {
       // numRowsUpdated is the number of rows affected by the update
       if (numRowsUpdated === 1) {
         return res.status(200).json({
-          message: `Category updated successfully!!`,
+          message: `Category updated successfully!`,
         });
       } else {
-        return res.status(404).json({ message: `Category not found` });
+        return res.status(404).json({ message: `Category not found!` });
       }
     }
-    res.status(400).json({ message: "Invalid request body" });
+    res.status(400).json({ message: "Invalid request body!" });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error!" });
   }
 };
 
-// Delete a category
 export const deleteCategory = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const deletedCategoryName = await Category.findByPk(req.params.id);
-    if (id) {
-      const category = await Category.destroy({
-        where: { id: id },
-      });
-      // same concept as before if the number of rows is greater than 0 then it means rows' number updated
-      // if it is 0 then it did not update/delete
-      if (category > 0) {
-        return res.status(200).json({
-          message: `Category ${deletedCategoryName.category_name} was deleted!`,
-        });
-      } else {
-        return res.status(404).json({ message: `Category not found` });
-      }
+
+    if (!id) {
+      return res.status(400).json({ message: "Invalid category ID" });
     }
 
-    return res.status(400).json({ message: "Invalid category ID" });
+    const deletedCategory = await Category.findByPk(id);
+
+    if (!deletedCategory) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    await Category.destroy({
+      where: { id: id },
+    });
+
+    return res.status(200).json({
+      message: `Category ${deletedCategory.category_name} and its related incomes were deleted!`,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -115,6 +115,7 @@ export const singleCategory = async (req, res, next) => {
 
     const oneCategory = await Category.findOne({
       where: { id: id },
+      include: Income,
     });
 
     if (!oneCategory) {
@@ -132,7 +133,9 @@ export const singleCategory = async (req, res, next) => {
 // get all categories without sorting
 export const allCategories = async (req, res, next) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({
+      include: Income,
+    });
 
     if (!categories) {
       return res.status(404).json({ error: "No categories found" });
@@ -174,6 +177,7 @@ export const getCategoriesByDay = async (req, res) => {
         },
       },
       order: [["date", "DESC"]],
+      include: Income,
     });
 
     if (categoriesByDay.length === 0) {
@@ -211,6 +215,7 @@ export const getCategoriesByWeek = async (req, res) => {
         },
       },
       order: [["date", sortOrder]],
+      include: Income,
     });
 
     if (categoriesByWeek.length === 0) {
@@ -246,6 +251,7 @@ export const getCategoriesByMonth = async (req, res) => {
         },
       },
       order: [["date", sortOrder]],
+      include: Income,
     });
 
     if (categoriesByMonth.length === 0) {
