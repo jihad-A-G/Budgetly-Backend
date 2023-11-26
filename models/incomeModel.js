@@ -1,6 +1,7 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
 import Category from "./categoryModel.js";
+import User from "./userModel.js";
 
 const Income = sequelize.define("Income", {
   income_name: {
@@ -19,12 +20,27 @@ const Income = sequelize.define("Income", {
 
 // relation with category (one to many)
 const associateModels = () => {
-  Category.hasMany(Income, {
+  Income.belongsTo(User, {
+    foreignKey: {
+      name: "UserId",
+      allowNull: false,
+    },
     onDelete: "CASCADE",
-    hooks: true,
   });
-  Income.belongsTo(Category);
-};
+}
 export { associateModels };
 
+const associateModels1 =() => {
+  Income.belongsTo(Category, {
+    foreignKey: {
+      name: "CategoryId",
+      allowNull: false,
+    },
+    onDelete: "CASCADE",
+  });
+  
+};
+export { associateModels1}
+
 export default Income;
+

@@ -1,6 +1,6 @@
 import express from "express";
 import * as categoryController from "../controllers/categoryContoller.js";
-import upload from "../uploadMiddleware.js";
+import upload from "../multer.js";
 
 const router = express.Router();
 router.post(
@@ -13,7 +13,7 @@ router.patch(
   upload.single("category_image"),
   categoryController.updateCategory
 );
-router.get("/", categoryController.allCategories);
+router.get("a/", categoryController.allCategories);
 router.delete("/:id", categoryController.deleteCategory);
 router.get("/:id", categoryController.singleCategory);
 

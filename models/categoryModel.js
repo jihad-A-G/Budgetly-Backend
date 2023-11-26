@@ -1,5 +1,6 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
+import User from "./userModel.js";
 const Category = sequelize.define("Category", {
   category_name: {
     type: DataTypes.TEXT,
@@ -14,5 +15,18 @@ const Category = sequelize.define("Category", {
     allowNull: false,
   },
 });
+
+const associateModels = ()=> {
+  User.hasMany(Category, {
+    onDelete: "CASCADE",
+    hooks: true,
+    foreignKey: { name: "UserId", allowNull: false },
+  });
+  Category.belongsTo(User, {
+    foreignKey: { name: "UserId", allowNull: false }, 
+  });
+}
+export {associateModels};
+
 
 export default Category;

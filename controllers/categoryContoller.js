@@ -6,8 +6,8 @@ import { Op } from "sequelize";
 //Create a new category
 export const addCategory = async (req, res, next) => {
   try {
-    const { category_name, date } = req.body;
-
+    const { category_name, date} = req.body;
+    
     // check if the category is already created
     const existingCategory = await Category.findOne({
       where: { category_name: category_name },
