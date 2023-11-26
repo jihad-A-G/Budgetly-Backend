@@ -33,10 +33,10 @@ export const userLogin = async (req,res,next) =>{
         if(!match){
             return res.status(404).json({message:'Invalid username or password'});
         }
-        req.session.isLoggedIn=true;
-        req.session.user=user;
-        await req.session.save();
-        res.status(200).json({message:'logged in!'});
+        
+        const token = jwt.sign({user:user},'cat in the box',{expiresIn:'1day'});
+
+        res.status(200).json({token:token,message:'logged in!'});
     }catch(err){console.error(err);}
 }
 
