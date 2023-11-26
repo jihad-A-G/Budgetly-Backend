@@ -1,13 +1,22 @@
 import Category from "../models/categoryModel.js";
 import Income from "../models/incomeModel.js";
+import User from "../models/userModel.js";
 import fs from "fs/promises";
 import { Op } from "sequelize";
 
 //Create a new category
 export const addCategory = async (req, res, next) => {
   try {
-    const { category_name, date} = req.body;
+    const { category_name, date, UserId} = req.body;
+        // check if the user is already created
+        const existingUser = await User.findOne({
+          where: { id: UserId},
+        });
     
+        if (!existingUser) {
+          return res.status(400).json({ message: "User not found." });
+        }
+
     // check if the category is already created
     const existingCategory = await Category.findOne({
       where: { category_name: category_name },
@@ -26,10 +35,11 @@ export const addCategory = async (req, res, next) => {
       category_name: category_name,
       category_image: category_image,
       date: date,
+      UserId: UserId
     });
 
     return res.status(200).json({
-      message: `${newCategory.category_name} was created successfully!`,
+      message: `${newCategory.category_name} was created successfully by ${existingUser.username}!`,
     });
   } catch (err) {
     console.error(err);
@@ -54,6 +64,8 @@ export const updateCategory = async (req, res, next) => {
       } else {
         req.body.category_image = null;
       }
+
+      req.body.user_id = updateCategory.user_id;
 
       // Update the category
       const [numRowsUpdated] = await Category.update(
@@ -116,6 +128,7 @@ export const singleCategory = async (req, res, next) => {
     const oneCategory = await Category.findOne({
       where: { id: id },
       include: Income,
+      include: User
     });
 
     if (!oneCategory) {
@@ -135,6 +148,7 @@ export const allCategories = async (req, res, next) => {
   try {
     const categories = await Category.findAll({
       include: Income,
+      include: User
     });
 
     if (!categories) {

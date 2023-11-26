@@ -1,11 +1,19 @@
 import Income from "../models/incomeModel.js";
 import Category from "../models/categoryModel.js";
+import User from "../models/userModel.js";
 import { Op } from "sequelize";
 
 //Create a new Income
 export const addIncome = async (req, res, next) => {
   try {
-    const { income_name, income_amount, CategoryId, date } = req.body;
+    const { income_name, income_amount, CategoryId, date, UserId } = req.body;
+    const existingUser = await User.findOne({
+      where: { id: UserId },
+    });
+
+    if (!existingUser) {
+      return res.status(400).json({ message: "User not found." });
+    }
 
     // check if the category exists
     const existingCategory = await Category.findByPk(CategoryId);
@@ -31,19 +39,21 @@ export const addIncome = async (req, res, next) => {
     const newIncome = await Income.create({
       income_name: income_name,
       income_amount: income_amount,
-      CategoryId: CategoryId,
       date: date,
+      CategoryId: CategoryId,
+      UserId: UserId,
     });
 
     // include category
     const createdIncome = await Income.findByPk(newIncome.id, {
-      include: [Category],
+      include: [Category, User],
     });
     const category_name = createdIncome.Category.category_name;
-
+    const user_name = createdIncome.User.username;
     return res.status(201).json({
       message: `${newIncome.income_name} was created successfully!`,
-      category_name: category_name,
+      Category: category_name,
+      User: user_name,
     });
   } catch (err) {
     console.error(err);
@@ -54,7 +64,7 @@ export const addIncome = async (req, res, next) => {
 // Update an existing Income
 export const updateIncome = async (req, res, next) => {
   try {
-    const { income_name, income_amount, date, CategoryId } = req.body;
+    const { income_name, income_amount, date, CategoryId, UserId } = req.body;
     const income = await Income.findByPk(req.params.id);
 
     if (!income) {
@@ -72,7 +82,7 @@ export const updateIncome = async (req, res, next) => {
     if (date !== undefined) {
       updateFields.date = date;
     }
-    
+
     if (CategoryId !== undefined) {
       // Check if the specified CategoryId exists
       const existingCategory = await Category.findByPk(CategoryId);
@@ -82,6 +92,16 @@ export const updateIncome = async (req, res, next) => {
         });
       }
       updateFields.CategoryId = CategoryId;
+    }
+
+    if (UserId !== undefined) {
+      const existingUser = await User.findByPk(UserId);
+      if (!existingUser) {
+        return res.status(404).json({
+          message: `User with id ${UserId} not found.`,
+        });
+      }
+      updateFields.UserId = UserId;
     }
 
     // Update only the specified fields
@@ -95,9 +115,9 @@ export const updateIncome = async (req, res, next) => {
       });
     }
 
-    // Include category
+    // Include category and user
     const updatedIncome = await Income.findByPk(req.params.id, {
-      include: [Category],
+      include: [Category, User],
     });
 
     return res.status(200).json({
@@ -150,7 +170,7 @@ export const singleIncome = async (req, res, next) => {
 
     const oneIncome = await Income.findOne({
       where: { id: id },
-      include: [Category],
+      include: [Category, User],
     });
 
     if (!oneIncome) {
@@ -170,7 +190,7 @@ export const allIncomes = async (req, res, next) => {
 
     const incomes = await Income.findAll({
       order: [["income_amount", orderDirection]],
-      include: [Category],
+      include: [Category, User],
     });
 
     if (!incomes.length) {
@@ -190,7 +210,7 @@ export const allIncomesByName = async (req, res, next) => {
 
     const incomes = await Income.findAll({
       order: [["income_name", orderDirection]],
-      include: [Category],
+      include: [Category, User],
     });
 
     if (!incomes.length) {
@@ -217,7 +237,7 @@ export const getIncomesByCategory = async (req, res, next) => {
 
     const incomes = await Income.findAll({
       where: { CategoryId: foundCategory.id },
-      include: [Category],
+      include: [Category, User],
     });
 
     if (incomes.length === 0) {

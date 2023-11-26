@@ -13,7 +13,7 @@ router.patch(
   upload.single("category_image"),
   categoryController.updateCategory
 );
-router.get("a/", categoryController.allCategories);
+router.get("/", categoryController.allCategories);
 router.delete("/:id", categoryController.deleteCategory);
 router.get("/:id", categoryController.singleCategory);
 
