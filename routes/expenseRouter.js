@@ -11,6 +11,4 @@ router.delete("/expense/:id", expenseController.deleteExpense)
 router.get("/expense/filter/sum", expenseController.getSumExpense)
 
 
-
-
 export default router;

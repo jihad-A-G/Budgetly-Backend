@@ -1,14 +1,8 @@
 import sequelize from "../db.js";
 import DataTypes from 'sequelize'
-// import Report from '../models/report.js'
+import Report from '../models/report.js'
 
 const Expense = sequelize.define('Expense', {
-
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey:true,
-        autoIncrement:true
-    },
 
     expense_amount: {
         type: DataTypes.FLOAT,
@@ -33,13 +27,11 @@ const Expense = sequelize.define('Expense', {
     // }
 );
 
+Report.hasMany(Expense,{foreignKey:{name:'reportId',allowNull:true}});
+Expense.belongsTo(Report, {
+    foreignKey: 'reportId',
+   });
 
-// Expense.belongsTo(Report, {
-//     foreignKey: 'reportId',
-//     as: 'report'
-//    });
-
-Expense.sync()
 
 export default Expense;
 

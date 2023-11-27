@@ -1,4 +1,6 @@
 import Expense from "../models/expense.js";
+import Report from "../models/report.js";
+import { Op } from "sequelize";
 
 //Get All Expenses
 export const getAllExpense = async (req, res) => {
@@ -25,9 +27,11 @@ export const getOneExpense = async (req, res) => {
 
 //Create Expense
 export const createExpense = async (req, res) => {
+    const {date} =req.body;
     try {
-
-        const createdExpense = await Expense.create(req.body);
+        const report= await Report.findOne({where:{start_date:{[Op.gte]:date, end_date:{[Op.lte]:date}}}});
+        
+        const createdExpense = await Expense.create({...req.body,reportId:report.id});
         res.status(200).json(createdExpense);
     }
     catch (err) {
