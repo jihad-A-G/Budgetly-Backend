@@ -1,5 +1,4 @@
 import Expense from "../models/expense.js";
-import Report from "../models/report.js";
 import { Op } from "sequelize";
 
 //Get All Expenses
@@ -53,7 +52,6 @@ export const updateExpense = async (req, res) => {
         }
     }
     // await Expense.update(req.body, { where: { id: id } })
-    //HASHHHHHHHHH
 
     catch (err) {
         console.error(err);

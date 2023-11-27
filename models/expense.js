@@ -1,6 +1,5 @@
 import sequelize from "../db.js";
 import DataTypes from 'sequelize'
-import Report from '../models/report.js'
 
 const Expense = sequelize.define('Expense', {
 
@@ -27,14 +26,8 @@ const Expense = sequelize.define('Expense', {
     // }
 );
 
-Report.hasMany(Expense,{foreignKey:{name:'reportId',allowNull:true}});
-Expense.belongsTo(Report, {
-    foreignKey: 'reportId',
-   });
 
 
 export default Expense;
 
 // date,category id foreign user id foreign
-
-// Expense.sync();
