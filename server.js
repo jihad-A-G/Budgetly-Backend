@@ -4,7 +4,6 @@ import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import companyRouter from './routes/companyRouter.js';
 import expenseRouter from './routes/expenseRouter.js';
-import reportRouter from './routes/reportRouter.js';
 import usersRouter from './routes/userRoutes.js';
 dotenv.config();
 const app = express();
@@ -22,7 +21,6 @@ app.use((req,res,next)=>{
 
 app.use('/api',companyRouter);
 app.use('/api',expenseRouter);
-app.use('/api',reportRouter);
 app.use('/api',usersRouter);
 
 await sequelize.sync();
