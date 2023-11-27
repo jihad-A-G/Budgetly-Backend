@@ -6,9 +6,9 @@ import { Op } from "sequelize";
 //Create a new Income
 export const addIncome = async (req, res, next) => {
   try {
-    const { income_name, income_amount, CategoryId, date, UserId } = req.body;
+    const { income_name, income_amount, CategoryId, date, userId } = req.body;
     const existingUser = await User.findOne({
-      where: { id: UserId },
+      where: { id: userId },
     });
 
     if (!existingUser) {
@@ -41,7 +41,7 @@ export const addIncome = async (req, res, next) => {
       income_amount: income_amount,
       date: date,
       CategoryId: CategoryId,
-      UserId: UserId,
+      userId: userId,
     });
 
     // include category

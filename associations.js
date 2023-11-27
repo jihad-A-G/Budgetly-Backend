@@ -19,23 +19,33 @@ Goal.belongsTo(User, { foreignKey: { name: "userId", allowNull: false } });
 
 //One-To-Many relation between the user and income
 User.hasMany(Income, {
-  foreignKey: { name: "UserId", allowNull: false },
-  onDelete: "CASCADE",
+  onDelete: 'SET NULL',
+  onUpdate: 'CASCADE',
+  foreignKey: { name: "userId", allowNull: true },
 });
-Income.belongsTo(User, { foreignKey: { name: "UserId", allowNull: false } });
+Income.belongsTo(User, { foreignKey: { name: "userId", allowNull: true } });
 
 //One-To-Many relation between the user and category
 User.hasMany(Category, {
-  foreignKey: { name: "UserId", allowNull: false },
-  onDelete: "CASCADE",
+  onDelete: 'SET NULL',
+  onUpdate: 'SET DEFAULT',
+  foreignKey: { name: "userId", allowNull: true },
 });
-Category.belongsTo(User, { foreignKey: { name: "UserId", allowNull: false } });
+Category.belongsTo(User, { foreignKey: { name: "userId", allowNull: true } });
 
 //One-To-Many relation between the category and income
 Category.hasMany(Income, {
-  foreignKey: { name: "CategoryId", allowNull: false },
-  onDelete: "CASCADE",
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+  foreignKey: {
+    name: "CategoryId",
+    allowNull: true,
+  },
 });
+
 Income.belongsTo(Category, {
-  foreignKey: { name: "CategoryId", allowNull: false },
+  foreignKey: {
+    name: "CategoryId",
+    allowNull: true,
+  },
 });

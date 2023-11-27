@@ -18,19 +18,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
 app.use("/images", express.static("images"));
-//Initializing session sequelize store.
-// const sequelizeStore = connectionSession(session.Store);
-
-// app.use(
-//   session({
-//     secret: "super user",
-//     store: new sequelizeStore({
-//       db: sequelize,
-//     }),
-//     resave: false,
-//     saveUninitialized: false,
-//   })
-// );
 
 app.use((req, res, next) => {
   console.log(req.path, req.method);
@@ -44,15 +31,11 @@ app.use("/api/category", categoryRouter);
 app.use("/api/income", incomeRouter);
 app.use("/api/goal", goalRouter);
 
-
-await sequelize.sync();
-// await sequelize.sync({ alter: true });
-// await sequelize.sync({ force: true });
-
-app.listen(process.env.PORT, (error) => {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log(`Server is listening at port ${process.env.PORT}`);
-  }
+sequelize.sync({ force:false }).then(() => {
+  app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+  });
+}).catch((err) => {
+  console.error("Sequelize sync error:", err);
 });
+

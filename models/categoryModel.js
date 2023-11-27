@@ -13,10 +13,7 @@ const Category = sequelize.define("Category", {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
-  UserId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
+
 });
 
 

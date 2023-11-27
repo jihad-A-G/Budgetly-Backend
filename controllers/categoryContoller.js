@@ -7,15 +7,15 @@ import { Op } from "sequelize";
 //Create a new category
 export const addCategory = async (req, res, next) => {
   try {
-    const { category_name, date, UserId} = req.body;
-        // check if the user is already created
-        const existingUser = await User.findOne({
-          where: { id: UserId},
-        });
-    
-        if (!existingUser) {
-          return res.status(400).json({ message: "User not found." });
-        }
+    const { category_name, date, userId} = req.body;
+    // check if the user is already created
+    const existingUser = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (!existingUser) {
+      return res.status(400).json({ message: "User not found." });
+    }
 
     // check if the category is already created
     const existingCategory = await Category.findOne({
@@ -35,11 +35,11 @@ export const addCategory = async (req, res, next) => {
       category_name: category_name,
       category_image: category_image,
       date: date,
-      UserId: UserId
+      userId: userId,
     });
 
     return res.status(200).json({
-      message: `${newCategory.category_name} was created successfully by ${existingUser.username}!`,
+      message: `${newCategory.category_name} was created successfully by!`,
     });
   } catch (err) {
     console.error(err);
@@ -89,6 +89,7 @@ export const updateCategory = async (req, res, next) => {
   }
 };
 
+// delete a category
 export const deleteCategory = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -102,6 +103,9 @@ export const deleteCategory = async (req, res, next) => {
     if (!deletedCategory) {
       return res.status(404).json({ message: "Category not found" });
     }
+    // await Income.destroy({
+    //   where: { CategoryId: id },
+    // });
 
     await Category.destroy({
       where: { id: id },
@@ -128,7 +132,7 @@ export const singleCategory = async (req, res, next) => {
     const oneCategory = await Category.findOne({
       where: { id: id },
       include: Income,
-      include: User
+      include: User,
     });
 
     if (!oneCategory) {
@@ -148,7 +152,7 @@ export const allCategories = async (req, res, next) => {
   try {
     const categories = await Category.findAll({
       include: Income,
-      include: User
+      include: User,
     });
 
     if (!categories) {
