@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import companyRouter from './routes/companyRouter.js';
 import expenseRouter from './routes/expenseRouter.js';
 import usersRouter from './routes/userRoutes.js';
+import reportRouter from './routes/reportRouter.js';
 dotenv.config();
 const app = express();
 //in order to let node understand the written code extended no need for it(we need only one thing)
@@ -22,8 +23,9 @@ app.use((req,res,next)=>{
 app.use('/api',companyRouter);
 app.use('/api',expenseRouter);
 app.use('/api',usersRouter);
+app.use('/api',reportRouter);
 
-await sequelize.sync();
+await sequelize.sync({force: false});
 
 app.listen(process.env.PORT, (error)=>{
     if(error){
