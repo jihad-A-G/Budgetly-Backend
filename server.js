@@ -1,37 +1,44 @@
-import express  from "express";
+import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+
 import sequelize from "./db.js";
 import bodyParser from "body-parser";
-import companyRouter from './routes/companyRouter.js';
-import expenseRouter from './routes/expenseRouter.js';
-import usersRouter from './routes/userRoutes.js';
-import reportRouter from './routes/reportRouter.js';
-dotenv.config();
+import './associations.js';
+import verfiyToken from "./authenticate.js";
+//Routers
+import companyRouter from "./routes/companyRouter.js";
+import AdminRouter from "./routes/AdminRouter.js";
+import userRouter from "./routes/userRouter.js";
+import authRouter from "./routes/authRouter.js";
+import categoryRouter from "./routes/categoryRouter.js";
+import incomeRouter from "./routes/incomeRouter.js";
+import goalRouter from "./routes/goalRouter.js"
 const app = express();
-//in order to let node understand the written code extended no need for it(we need only one thing)
-//check for urlencoded when true when false
-// app.use(bodyParser.urlencoded({extended:false}));
-// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+app.use('/images',express.static("images"));
 
-// it log what method u did (patch,create...)
-app.use((req,res,next)=>{
-    console.log(req.path, req.method);
-    next();
-})
+//Authenticate user
+app.use(verfiyToken);
 
-app.use('/api',companyRouter);
-app.use('/api',expenseRouter);
-app.use('/api',usersRouter);
-app.use('/api',reportRouter);
+app.use((req, res, next) => {
+  console.log(req.path, req.method);
+  next();
+});
+app.use("/api/auth", authRouter);
+app.use("/api/company", companyRouter);
+app.use("/api/admin", AdminRouter);
+app.use("/api/user", userRouter);
+app.use("/api/category", categoryRouter);
+app.use("/api/income", incomeRouter);
+app.use("/api/goal", goalRouter);
 
-await sequelize.sync({force: false});
+sequelize.sync({ force:false }).then(() => {
+  app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+  });
+}).catch((err) => {
+  console.error("Sequelize sync error:", err);
+});
 
-app.listen(process.env.PORT, (error)=>{
-    if(error){
-        console.error(error);
-    }
-    else{
-        console.log(`Server is listening at port ${process.env.PORT}`);
-    }
-})
