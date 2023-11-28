@@ -5,7 +5,8 @@ dotenv.config();
 import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import './associations.js';
-// import verfiyToken from "./authenticate.js";
+import verfiyToken from "./authenticate.js";
+import cors from 'cors';
 //Routers
 import companyRouter from "./routes/companyRouter.js";
 import AdminRouter from "./routes/AdminRouter.js";
@@ -17,16 +18,16 @@ import goalRouter from "./routes/goalRouter.js"
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors());
 app.use('/images',express.static("images"));
 
-//Authenticate user
-// app.use(verfiyToken);
 
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 app.use("/api/auth", authRouter);
+app.use(verfiyToken);
 app.use("/api/company", companyRouter);
 app.use("/api/admin", AdminRouter);
 app.use("/api/user", userRouter);
