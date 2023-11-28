@@ -14,8 +14,8 @@ Company.hasMany(Admin, { foreignKey: { name: "compId", allowNull: false } });
 Admin.belongsTo(Company, { foreignKey: { name: "compId", allowNull: false } });
 
 //One-To-Many relation between the user and goal
-User.hasMany(Goal, { foreignKey: { name: "userId", allowNull: false } });
-Goal.belongsTo(User, { foreignKey: { name: "userId", allowNull: false } });
+User.hasMany(Goal, { foreignKey: { name: "userId", allowNull: true } });
+Goal.belongsTo(User, { foreignKey: { name: "userId", allowNull: true } });
 
 //One-To-Many relation between the user and income
 User.hasMany(Income, {

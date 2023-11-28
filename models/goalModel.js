@@ -1,24 +1,24 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
-import Users from './users.js';
 
-const Goal = sequelize.define('User', {
-    username: {
-        type: DataTypes.UUID,
+const Goal = sequelize.define('Goal', {
+    name: {
+        type: DataTypes.TEXT,
         allowNull: false,
     },
-    text: {
-        type: DataTypes.TEXT,
-        allowNull: false["Please add a text value"],
-        unique: true
+    start_date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+    },
+    end_date:{
+        type:DataTypes.DATE,
+        allowNull:false,
+    },
+    target_amount:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
     }
+
 })
-
-
-Users.hasMany(Goal,{
-    foreignKey: 'goalId',
-    as: 'goal'
-});
-Goal.belongsTo(Users)
 
 export default Goal;

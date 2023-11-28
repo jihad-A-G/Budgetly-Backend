@@ -1,7 +1,5 @@
 import sequelize from "../db.js";
 import { DataTypes } from "sequelize";
-import Category from "./categoryModel.js";
-import Income from "./incomeModel.js";
 const User = sequelize.define("User", {
   username: {
     type: DataTypes.TEXT,
@@ -17,6 +15,7 @@ const User = sequelize.define("User", {
   },
   role: {
     type: DataTypes.TEXT,
+    defaultValue:null,
     allowNull: true,
   },
   user_img: {
