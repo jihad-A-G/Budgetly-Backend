@@ -6,7 +6,7 @@ import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import './associations.js';
 import verfiyToken from "./authenticate.js";
-import cors from 'cors'l
+import cors from 'cors';
 //Routers
 import companyRouter from "./routes/companyRouter.js";
 import AdminRouter from "./routes/AdminRouter.js";
