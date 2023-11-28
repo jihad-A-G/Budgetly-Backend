@@ -30,7 +30,7 @@ export const getUserById = async (req, res, next) => {
 };
 
 export const addUser = async (req, res, next) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password} = req.body;
   try {
     if (req.body) {
       const hashedPassword = await bcrypt.hash(password, 12);
@@ -38,7 +38,6 @@ export const addUser = async (req, res, next) => {
         username: username,
         email: email,
         password: hashedPassword,
-        role: role,
         compId: 1,
       });
       return res

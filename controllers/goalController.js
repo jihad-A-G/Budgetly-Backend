@@ -27,10 +27,10 @@ export const getGoalById = async(req,res,next) =>{
 };
 
 export const addGoal = async(req,res,next) =>{
-    const {goal_name, start_date,end_date,target_amount,userId} = req.body;
+    const {name, start_date,end_date,target_amount,userId} = req.body;
     try{
         if(req.body){
-            const goal= await Goal.create({goal_name:goal_name,start_date:start_date,end_date:end_date,target_amount:target_amount,userId:userId});
+            const goal= await Goal.create({name:name,start_date:start_date,end_date:end_date,target_amount:target_amount,userId:userId});
             res.status(200).json({goal:goal,message:'Goal created successfully'});
         }
     }catch(err){
