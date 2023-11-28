@@ -5,7 +5,7 @@ dotenv.config();
 import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import './associations.js';
-import verfiyToken from "./authenticate.js";
+// import verfiyToken from "./authenticate.js";
 //Routers
 import companyRouter from "./routes/companyRouter.js";
 import AdminRouter from "./routes/AdminRouter.js";
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use('/images',express.static("images"));
 
 //Authenticate user
-app.use(verfiyToken);
+// app.use(verfiyToken);
 
 app.use((req, res, next) => {
   console.log(req.path, req.method);
@@ -34,7 +34,7 @@ app.use("/api/category", categoryRouter);
 app.use("/api/income", incomeRouter);
 app.use("/api/goal", goalRouter);
 
-sequelize.sync({ force:false }).then(() => {
+sequelize.sync({ force:true }).then(() => {
   app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
   });
