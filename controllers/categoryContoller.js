@@ -39,7 +39,7 @@ export const addCategory = async (req, res, next) => {
     });
 
     return res.status(200).json({
-      message: `${newCategory.category_name} was created successfully by!`,
+      message: `${newCategory.category_name} was created successfully by ${existingUser.username}!`,
     });
   } catch (err) {
     console.error(err);
