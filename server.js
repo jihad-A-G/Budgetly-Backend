@@ -4,6 +4,7 @@ import sequelize from "./db.js";
 import bodyParser from "body-parser";
 import './associations.js';
 import verfiyToken from "./authenticate.js";
+import cors from 'cors'l
 //Routers
 import companyRouter from './routes/companyRouter.js';
 import AdminRouter from './routes/AdminRouter.js';
@@ -14,6 +15,7 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(express.json());
+app.use(cors());
 app.use('/images',express.static("images"));
 
 //Authenticate user
