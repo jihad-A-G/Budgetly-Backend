@@ -1,4 +1,4 @@
-import Goal from "../models/";
+import Goal from "../models/goalModel.js";
 import User from "../models/userModel.js";
 
 export const getGoals = async(req,res,next) =>{

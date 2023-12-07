@@ -6,6 +6,7 @@ import { Op } from "sequelize";
 //Create a new Income
 export const addIncome = async (req, res, next) => {
   try {
+    console.log(req.body)
     const { income_name, income_amount, CategoryId, date, userId } = req.body;
     const existingUser = await User.findOne({
       where: { id: userId },
