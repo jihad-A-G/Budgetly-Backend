@@ -20,7 +20,7 @@ try{
 
     const hashedPassword= await bcrypt.hash(password,12);
     user=await User.create({username:username,email:email,password:hashedPassword,compId:1});
-    io.to('adminRoom').emit('confirmUser',user);
+    io.emit('confirmUser',user);
     res.status(200).json({user:user,message:'User signup wating to confirm'});
 
 }catch(err){console.error(err);}

@@ -48,11 +48,12 @@ const httpServer = createServer(app);
   }});
 io.on("connection", (socket) => {
   console.log(socket.id);
-  socket.on('joinAdminRoom',(socket)=>{
-    socket.join('adminRoom');
+  socket.on('joinAdminRoom',(user)=>{
+    if(user.role==='admin'){
+      socket.join('adminRoom');
+    }
   })
 });
 httpServer.listen(process.env.PORT);
 
 export default io;
-
