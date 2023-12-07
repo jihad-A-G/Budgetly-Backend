@@ -14,6 +14,10 @@ password:{
     type:DataTypes.TEXT,
     allowNull:false
 },
+role:{
+    type:DataTypes.TEXT,
+    defaultValue:'admin'
+},
 admin_img:{
     type:DataTypes.TEXT,
     defaultValue:null

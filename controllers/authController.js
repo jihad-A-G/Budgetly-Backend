@@ -4,6 +4,8 @@ import { Op } from "sequelize";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import sendgrid from '@sendgrid/mail';
+import Admin from "../models/adminModel.js";
+import io from "../server.js";
 dotenv.config();
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
@@ -17,26 +19,38 @@ try{
     }
 
     const hashedPassword= await bcrypt.hash(password,12);
-    user=await User.create({username:username,email:email,password:hashedPassword});
-    res.status(200).json({user:user,message:'User signup successfully'});
+    user=await User.create({username:username,email:email,password:hashedPassword,compId:1});
+    io.to('adminRoom').emit('confirmUser',user);
+    res.status(200).json({user:user,message:'User signup wating to confirm'});
 
 }catch(err){console.error(err);}
 }
 export const userLogin = async (req,res,next) =>{
     const {username,password}= req.body;
+    let loggedInUser;
     try{
         const user= await User.findOne({where:{username:username}});
-        if(!user){
-            return res.status(404).json({message:'user not found'});
+        if(user){
+            loggedInUser=user;
         }
-        const match = await bcrypt.compare(password,user.password);
+        else{
+            const admin = await Admin.findOne({where:{username:username}});
+            if(admin){
+                loggedInUser=admin;
+            }else{
+                return res.status(404).json({message:'User not found'});
+            }
+        }
+        const match = await bcrypt.compare(password,loggedInUser.password);
         if(!match){
-            return res.status(404).json({message:'Invalid username or password'});
+            return res.status(400).json({message:'Invalid username or password'});
         }
         
-        const token = jwt.sign({user:user},'cat in the box',{expiresIn:'1day'});
+        const token = jwt.sign({user:loggedInUser},'cat in the box',{expiresIn:'1d'});
 
-        res.status(200).json({token:token,message:'logged in!'});
+       return res.status(200).json({token:token,user:loggedInUser,message:'logged in!'});
+    
+  
     }catch(err){console.error(err);}
 }
 
