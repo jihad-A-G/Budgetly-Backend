@@ -150,10 +150,14 @@ export const singleCategory = async (req, res, next) => {
 // get all categories without sorting
 export const allCategories = async (req, res, next) => {
   try {
+    const sortOrder = req.query.order === "asc" ? "ASC" : "DESC";
+
     const categories = await Category.findAll({
+      order: [["date", sortOrder]],
       include: Income,
       include: User,
-    });
+    }
+    );
 
     if (!categories) {
       return res.status(404).json({ error: "No categories found" });
@@ -164,6 +168,7 @@ export const allCategories = async (req, res, next) => {
     res.status(500).json({ error: "Failed to retrieve the categories" });
   }
 };
+
 
 // Get Categories by Day
 export const getCategoriesByDay = async (req, res) => {
@@ -188,13 +193,15 @@ export const getCategoriesByDay = async (req, res) => {
       999
     );
 
+    const sortOrder = req.query.order === "asc" ? "ASC" : "DESC";
+
     const categoriesByDay = await Category.findAll({
       where: {
         date: {
           [Op.between]: [startOfDay, endOfDay],
         },
       },
-      order: [["date", "DESC"]],
+      order: [["date", sortOrder]],
       include: Income,
     });
 
@@ -212,6 +219,7 @@ export const getCategoriesByDay = async (req, res) => {
       .json({ error: "Error fetching categories for the specified day" });
   }
 };
+
 
 // Get Categories by Week
 export const getCategoriesByWeek = async (req, res) => {

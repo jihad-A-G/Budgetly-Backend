@@ -12,7 +12,7 @@ const Category = sequelize.define("Category", {
   date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
-  },
+  }, 
 
 });
 
