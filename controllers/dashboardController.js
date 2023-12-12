@@ -2,10 +2,11 @@ import Income from '../models/incomeModel.js';
 import Expense from '../models/expense.js';
 import Company from '../models/companyModel.js';
 import sequelize from '../db.js';
+import Category from '../models/categoryModel.js';
 const getDashboardData = async (req,res,next) =>{
     try{
         const incomes = await Income.findAll();
-        const expenses = await Expense.findAll();
+        const expenses = await Expense.findAll({include:Category});
         const profit = await Company.findOne({attributes:['profit']});
         const income_amount = incomes.reduce((accumelator,current) => accumelator+current.income_amount,0);
         const expense_amount = expenses.reduce((accumelator,current) => accumelator+current.expense_amount,0);

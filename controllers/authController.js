@@ -20,8 +20,8 @@ try{
 
     const hashedPassword= await bcrypt.hash(password,12);
     user=await User.create({username:username,email:email,password:hashedPassword,compId:1});
-    io.emit('confirmUser',user);
-    res.status(200).json({user:user,message:'User signup wating to confirm'});
+    io.to('adminRoom').emit('confirmUser',user);
+    res.status(200).json({user:user,message:'User signup waiting to confirm'});
 
 }catch(err){console.error(err);}
 }
@@ -38,15 +38,15 @@ export const userLogin = async (req,res,next) =>{
             if(admin){
                 loggedInUser=admin;
             }else{
-                return res.status(404).json({message:'User not found'});
+                return res.status(404).json({message:'User not found',code:'404'});
             }
         }
         const match = await bcrypt.compare(password,loggedInUser.password);
-        if(!match){
-            return res.status(400).json({message:'Invalid username or password'});
+        if(!match || !loggedInUser.authorized){
+            return res.status(403).json({message:'Invalid username or password',code:'403'});
         }
         
-        const token = jwt.sign({user:loggedInUser},'cat in the box',{expiresIn:'1d'});
+        const token = jwt.sign({user:loggedInUser},'cat in the box',{expiresIn:'1h'});
 
        return res.status(200).json({token:token,user:loggedInUser,message:'logged in!'});
     

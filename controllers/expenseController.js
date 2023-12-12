@@ -1,8 +1,9 @@
+import Category from "../models/categoryModel.js";
 import Expense from "../models/expense.js";
 
 //Get All Expenses
 export const getAllExpense = async (req, res) => {
-    const expenses = await Expense.findAll()
+    const expenses = await Expense.findAll({include:Category})
     res.status(200).json(expenses);
 }
 
@@ -10,7 +11,7 @@ export const getAllExpense = async (req, res) => {
 export const getOneExpense = async (req, res) => {
     const { id } = req.params
     try {
-        const expenses = await Expense.findOne({ where: { id: id } })
+        const expenses = await Expense.findByPk(id)
         if (!expenses) {
             res.status(404).json({ error: 'No such id' });
         }
@@ -26,8 +27,7 @@ export const getOneExpense = async (req, res) => {
 //Create Expense
 export const createExpense = async (req, res) => {
     try {
-
-        const createdExpense = await Expense.create(req.body);
+        const createdExpense = await Expense.create({...req.body});
         res.status(200).json(createdExpense);
     }
     catch (err) {
@@ -44,7 +44,7 @@ export const updateExpense = async (req, res) => {
         if (!updatedExpense) {
             res.status(404).json({ error: 'No such id' })
         } else {
-            await Expense.update(req.body, { where: { id: id } })
+            await Expense.update({...req.body}, { where: { id: id } })
             res.status(200).json(updatedExpense)
         }
     }

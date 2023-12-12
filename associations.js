@@ -4,6 +4,7 @@ import Admin from "./models/adminModel.js";
 import Goal from "./models/goalModel.js";
 import Category from "./models/categoryModel.js";
 import Income from "./models/incomeModel.js";
+import Expense from "./models/expense.js";
 
 //One-To-Many relation between company and users
 Company.hasMany(User, { foreignKey: { name: "compId", allowNull: false } });
@@ -49,3 +50,31 @@ Income.belongsTo(Category, {
     allowNull: true,
   },
 });
+
+//One-toMany realtion between the category and expense
+Category.hasMany(Expense,{
+  onDelete:'CASCADE',
+  onUpdate:'CASCADE',
+  foreignKey:{
+    name:'CategoryId',
+    allowNull:false,
+  }
+
+}
+  )
+  Expense.belongsTo(Category,{
+    foreignKey:{
+      name:'CategoryId',
+      allowNull:false,
+    }
+  })
+
+//One-To-Many relation between the user and expense
+User.hasMany(Expense, {
+  onDelete: 'SET NULL',
+  onUpdate: 'CASCADE',
+  foreignKey: { name: "userId", allowNull: true },
+});
+Expense.belongsTo(User, { foreignKey: { name: "userId", allowNull: true } });
+
+

@@ -11,7 +11,8 @@ const sequelize = new Sequelize('Budgetly', 'sa', `${process.env.DB_PASSWORD}`, 
       options: {
           encrypt: true,
       }
-    }
+    },
+    logging:false
   });
 
   

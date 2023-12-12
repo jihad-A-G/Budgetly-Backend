@@ -8,7 +8,8 @@ router.get('/',AdminController.getUsers);
 router.get('/dashboard',getDashboardData);
 router.get('/:id',AdminController.getUserById);
 router.post('/',AdminController.addUser);
-router.put('/:id',upload.single('user_img'),AdminController.updateUserProfileImg);
+router.put('/:id',AdminController.updateUser);
+router.put('/update-img/:id',upload.single('user_img'),AdminController.updateUserProfileImg);
 router.delete('/:id',AdminController.deleteUser);
 
 export default router;

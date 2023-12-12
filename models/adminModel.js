@@ -18,6 +18,10 @@ role:{
     type:DataTypes.TEXT,
     defaultValue:'admin'
 },
+authorized:{
+    type:DataTypes.BOOLEAN,
+    defaultValue:false
+},
 admin_img:{
     type:DataTypes.TEXT,
     defaultValue:null

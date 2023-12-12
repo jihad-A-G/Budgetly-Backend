@@ -64,56 +64,16 @@ export const addIncome = async (req, res, next) => {
 // Update an existing Income
 export const updateIncome = async (req, res, next) => {
   try {
-    const { income_name, income_amount, date, CategoryId, UserId } = req.body;
     const income = await Income.findByPk(req.params.id);
 
     if (!income) {
       return res.status(404).json({ message: "Income not found" });
     }
 
-    // Create an object with only the fields to be updated
-    const updateFields = {};
-    if (income_name !== undefined) {
-      updateFields.income_name = income_name;
-    }
-    if (income_amount !== undefined) {
-      updateFields.income_amount = income_amount;
-    }
-    if (date !== undefined) {
-      updateFields.date = date;
-    }
-
-    if (CategoryId !== undefined) {
-      // Check if the specified CategoryId exists
-      const existingCategory = await Category.findByPk(CategoryId);
-      if (!existingCategory) {
-        return res.status(404).json({
-          message: `Category with id ${CategoryId} not found.`,
-        });
-      }
-      updateFields.CategoryId = CategoryId;
-    }
-
-    if (UserId !== undefined) {
-      const existingUser = await User.findByPk(UserId);
-      if (!existingUser) {
-        return res.status(404).json({
-          message: `User with id ${UserId} not found.`,
-        });
-      }
-      updateFields.UserId = UserId;
-    }
-
     // Update only the specified fields
-    const [numRowsUpdated] = await Income.update(updateFields, {
+await Income.update({...req.body}, {
       where: { id: req.params.id },
     });
-
-    if (numRowsUpdated === 0) {
-      return res.status(500).json({
-        message: "Failed to update income. No rows were affected.",
-      });
-    }
 
     // Include category and user
     const updatedIncome = await Income.findByPk(req.params.id, {

@@ -49,6 +49,21 @@ export const addUser = async (req, res, next) => {
     console.error(err);
   }
 };
+export const updateUser = async(req,res,next) =>{
+  const {id}= req.params;
+  try{
+    if(id){
+      const user = await User.update({...req.body},{where:{
+        id:id
+      }});
+      return res.status(200).json({message:'user updated successfully'});
+    }
+    res.status(500).json({message:'something went wrong'});
+
+  }catch(err){
+    console.log(err);
+  }
+}
 
 export const deleteUser = async (req,res, next)=>{
      const {id:userId} = req.params;
