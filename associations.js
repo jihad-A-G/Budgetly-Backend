@@ -1,9 +1,10 @@
 import Company from "./models/companyModel.js";
-import User from "./models/userModel.js";
+import User from "./models/userModel.js";  
 import Admin from "./models/adminModel.js";
 import Goal from "./models/goalModel.js";
 import Category from "./models/categoryModel.js";
 import Income from "./models/incomeModel.js";
+
 
 //One-To-Many relation between company and users
 Company.hasMany(User, { foreignKey: { name: "compId", allowNull: false } });
@@ -49,3 +50,4 @@ Income.belongsTo(Category, {
     allowNull: true,
   },
 });
+

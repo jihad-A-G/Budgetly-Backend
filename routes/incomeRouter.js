@@ -10,7 +10,7 @@ router.get("/filter/:category", incomeController.getIncomesByCategory);
 router.get("/", incomeController.allIncomes);
 router.get("/:id", incomeController.singleIncome);
 router.post("/", incomeController.addIncome);
-router.patch("/:id", incomeController.updateIncome);
+router.put("/:id", incomeController.updateIncome);
 router.delete("/:id", incomeController.deleteIncome);
 
 router.get("/incomesbydate/:date", incomeController.getIncomesByDay);

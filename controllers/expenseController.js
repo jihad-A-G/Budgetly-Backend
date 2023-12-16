@@ -1,5 +1,6 @@
 import Expense from "../models/expense.js";
-
+import User from "../models/userModel.js";
+import { Op } from "sequelize";
 //Get All Expenses
 export const getAllExpense = async (req, res) => {
     const expenses = await Expense.findAll()
